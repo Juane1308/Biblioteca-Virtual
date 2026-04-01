@@ -40,3 +40,31 @@ class Libro(db.Model):
     def eliminar(self):
         db.session.delete(self)
         db.session.commit()
+
+    # ── Queries ───────────────────────────────
+
+    @staticmethod
+    def listar_todos():
+        return Libro.query.order_by(Libro.titulo).all()
+
+    @staticmethod
+    def buscar_por_id(lid):
+        return Libro.query.get_or_404(lid)
+
+    @staticmethod
+    def buscar_por_isbn(isbn):
+        return Libro.query.filter_by(isbn=isbn).first()
+
+    @staticmethod
+    def buscar(termino):
+        return Libro.query.filter(
+            db.or_(
+                Libro.titulo.ilike(f'%{termino}%'),
+                Libro.isbn.ilike(f'%{termino}%'),
+                Libro.genero.ilike(f'%{termino}%'),
+                Libro.descripcion.ilike(f'%{termino}%'),
+            )
+        ).all()
+
+    def __repr__(self):
+        return f'<Libro {self.titulo}>'

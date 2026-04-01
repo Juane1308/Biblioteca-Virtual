@@ -29,3 +29,42 @@ class Prestamo(db.Model):
         self.libro.aumentar_disponibilidad()
         db.session.commit()
 
+    @staticmethod
+    def registrar_prestamo(usuario, libro):
+        if not usuario.activo:
+            return None, 'El usuario no está activo.'
+        if not libro.esta_disponible():
+            return None, 'No hay ejemplares disponibles.'
+        prestamo = Prestamo(
+            usuario_id    = usuario.id,
+            libro_id      = libro.id,
+            fecha_prestamo = date.today(),
+            fecha_limite  = date.today() + timedelta(days=14),
+            estado        = 'Activo'
+        )
+        libro.reducir_disponibilidad()
+        db.session.add(prestamo)
+        db.session.commit()
+        return prestamo, None
+
+
+    # ── Queries ───────────────────────────────
+
+    @staticmethod
+    def listar_activos():
+        return Prestamo.query.filter_by(estado='Activo').order_by(Prestamo.fecha_limite).all()
+
+    @staticmethod
+    def historial_usuario(usuario_id):
+        return Prestamo.query.filter_by(usuario_id=usuario_id).order_by(Prestamo.fecha_prestamo.desc()).all()
+
+    @staticmethod
+    def historial_libro(libro_id):
+        return Prestamo.query.filter_by(libro_id=libro_id).order_by(Prestamo.fecha_prestamo.desc()).all()
+
+    @staticmethod
+    def buscar_por_id(pid):
+        return Prestamo.query.get_or_404(pid)
+
+    def __repr__(self):
+        return f'<Prestamo {self.id} [{self.estado}]>'
