@@ -57,3 +57,23 @@ class Usuario(db.Model, UserMixin):
 
     def prestamos_activos(self):
         return [p for p in self.prestamos if p.estado == 'Activo']
+
+    # ── Queries ───────────────────────────────
+    @staticmethod
+    def listar_todos():
+        return Usuario.query.order_by(Usuario.nombre).all()
+
+    @staticmethod
+    def buscar_por_username(username):
+        return Usuario.query.filter_by(username=username).first()
+
+    @staticmethod
+    def buscar_por_email(email):
+        return Usuario.query.filter_by(email=email).first()
+
+    @staticmethod
+    def buscar_por_id(uid):
+        return Usuario.query.get_or_404(uid)
+
+    def __repr__(self):
+        return f'<Usuario {self.username} [{self.rol}]>'

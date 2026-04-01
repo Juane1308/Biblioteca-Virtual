@@ -26,3 +26,21 @@ class Autor(db.Model):
     def eliminar(self):
         db.session.delete(self)
         db.session.commit()
+
+
+    # ── Queries ───────────────────────────────
+
+    @staticmethod
+    def listar_todos():
+        return Autor.query.order_by(Autor.nombre).all()
+
+    @staticmethod
+    def buscar_por_id(aid):
+        return Autor.query.get_or_404(aid)
+
+    @staticmethod
+    def existe_por_nombre(nombre):
+        return Autor.query.filter(db.func.lower(Autor.nombre) == nombre.lower()).first()
+
+    def __repr__(self):
+        return f'<Autor {self.nombre}>'
