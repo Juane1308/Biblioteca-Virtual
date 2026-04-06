@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Biblioteca Virtual</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+    <nav class="dashboard-nav">
+        <div class="brand">Biblioteca Virtual</div>
+        <div class="nav-links">
+            <a href="#">Catálogo</a>
+            <a href="#">Mis Préstamos</a>
+            {% if current_user.es_admin %}
+            <a href="#">Administración</a>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}" class="logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-content">
+        <div class="welcome-banner">
+            <h1>Hola, {{ current_user.nombre }}</h1>
+            <p>Bienvenido al panel principal de la biblioteca. Aquí puedes explorar y gestionar tus lecturas.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-title">Préstamos Activos</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Libros Leídos</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Nuevos Ingresos</span>
+                <span class="stat-value">12</span>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
