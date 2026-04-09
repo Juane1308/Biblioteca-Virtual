@@ -9,7 +9,7 @@ libro_autor = db.Table(
 
 
 class Autor(db.Model):
-    """Autor bibliográfico del catálogo."""
+    #Autor bibliográfico del catálogo.
     __tablename__ = 'autor'
 
     id           = db.Column(db.Integer, primary_key=True)
