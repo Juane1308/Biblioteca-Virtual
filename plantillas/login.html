@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesion - Biblioteca Virtual</title>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
@@ -86,21 +88,30 @@
             <div class="split-form split-form-signup">
                 <h3 class="split-form-title">Sign Up</h3>
                 <div class="split-title-line"></div>
-                <form autocomplete="off">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('auth.registro') }}" autocomplete="off">
                     <div class="split-input-group">
-                        <input type="text" class="split-input" placeholder="Usuario" autocomplete="off">
+                        <input type="text" name="username" class="split-input" placeholder="Usuario" required autocomplete="off">
                         <svg class="split-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                         </svg>
                     </div>
                     <div class="split-input-group">
-                        <input type="email" class="split-input" placeholder="Email" autocomplete="off">
+                        <input type="email" name="email" class="split-input" placeholder="Email" required autocomplete="off">
                         <svg class="split-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
                         </svg>
                     </div>
                     <div class="split-input-group">
-                        <input type="password" id="signup-password" class="split-input" placeholder="Contrasena" autocomplete="new-password">
+                        <input type="password" id="signup-password" name="password" class="split-input" placeholder="Contrasena" required autocomplete="new-password">
                         <button type="button" class="eye-toggle" onclick="togglePassword('signup-password', this)" tabindex="-1">
                             <svg class="eye-icon eye-closed" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
@@ -110,7 +121,7 @@
                             </svg>
                         </button>
                     </div>
-                    <button type="button" class="split-btn">Sign Up</button>
+                    <button type="submit" class="split-btn">Sign Up</button>
                 </form>
                 <p class="split-switch-text">Ya tienes cuenta? <button class="go-login">Login</button></p>
             </div>
