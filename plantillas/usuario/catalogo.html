@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo — Biblioteca Virtual{% endblock %}
+
+{% block content %}
+<main class="cat-main">
+
+    <!-- Cabecera -->
+    <section class="cat-header">
+        <div class="cat-header-inner">
+            <h1 class="cat-title">Catálogo <em>Completo</em></h1>
+            <p class="cat-subtitle">{{ libros|length if libros else 0 }} libros disponibles</p>
+
+            <!-- Buscador -->
+            <form class="cat-search-form" method="GET" action="{{ url_for('usuario.catalogo') }}" autocomplete="off">
+                <div class="cat-search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" name="q" value="{{ query or '' }}" placeholder="Buscar por título, autor, género, ISBN..." autocomplete="off">
+                    <button type="submit">Buscar</button>
+                </div>
+            </form>
+
+            <!-- Filtro por género -->
+            <form class="cat-filters" method="GET" action="{{ url_for('usuario.catalogo') }}">
+                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                <button type="submit" name="genero" value="" class="cat-filter-btn {% if not genero_activo %}active{% endif %}">Todos</button>
+                {% for g in generos %}
+                <button type="submit" name="genero" value="{{ g }}" class="cat-filter-btn {% if genero_activo == g %}active{% endif %}">{{ g }}</button>
+                {% endfor %}
+            </form>
+        </div>
+    </section>
+
+    <!-- Grid de libros -->
+    <section class="cat-grid-section">
+        <div class="cat-grid">
+            {% if libros %}
+                {% for libro in libros %}
+                <a href="{{ url_for('usuario.detalle', libro_id=libro.id) }}" class="cat-book-card">
+                    <div class="cat-book-cover">
+                        <span class="cat-disponibilidad {% if libro.esta_disponible() %}disponible{% else %}no-disponible{% endif %}">
+                            {% if libro.esta_disponible() %}Disponible{% else %}No disponible{% endif %}
+                        </span>
+                        <div class="cat-cover-inner">
+                            <div class="cat-cover-spine"></div>
+                            <div class="cat-cover-front">
+                                <p class="cat-cover-titulo">{{ libro.titulo }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cat-book-info">
+                        <h3>{{ libro.titulo }}</h3>
+                        <p class="cat-book-autores">
+                            {% if libro.autores %}
+                                {{ libro.autores | map(attribute='nombre') | join(', ') }}
+                            {% else %}
+                                Autor desconocido
+                            {% endif %}
+                        </p>
+                        <div class="cat-book-meta">
+                            {% if libro.genero %}<span class="pl-book-genre">{{ libro.genero }}</span>{% endif %}
+                            {% if libro.anio_pub %}<span class="cat-anio">{{ libro.anio_pub }}</span>{% endif %}
+                        </div>
+                        <p class="cat-ejemplares">
+                            {{ libro.ejemplares_disponibles }}/{{ libro.ejemplares_total }} ejemplares
+                        </p>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="cat-empty">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                    <p>No se encontraron libros{% if query %} para "<strong>{{ query }}</strong>"{% endif %}.</p>
+                    {% if query %}<a href="{{ url_for('usuario.catalogo') }}" class="pl-btn-secondary">Ver todo el catálogo</a>{% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+</main>
+{% endblock %}

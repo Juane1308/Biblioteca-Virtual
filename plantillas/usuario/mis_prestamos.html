@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Préstamos — Biblioteca Virtual{% endblock %}
+
+{% block content %}
+<main class="mispres-main">
+    <div class="mispres-inner">
+
+        <div class="mispres-header">
+            <div>
+                <h1>Mis <em>Préstamos</em></h1>
+                <p class="cat-subtitle">Hola, <strong>{{ current_user.nombre }}</strong> — historial completo de tus lecturas</p>
+            </div>
+            <a href="{{ url_for('usuario.catalogo') }}" class="pl-btn-hero">Explorar catálogo</a>
+        </div>
+
+        <!-- Resumen -->
+        {% set activos = prestamos | selectattr('estado', 'equalto', 'Activo') | list %}
+        {% set vencidos = prestamos | selectattr('estado', 'equalto', 'Activo') | selectattr('esta_vencido') | list %}
+        <div class="mispres-stats">
+            <div class="mispres-stat">
+                <span class="mispres-stat-num">{{ activos | length }}</span>
+                <span class="mispres-stat-label">Activos</span>
+            </div>
+            <div class="mispres-stat">
+                <span class="mispres-stat-num" style="color:var(--danger)">{{ vencidos | length }}</span>
+                <span class="mispres-stat-label">Vencidos</span>
+            </div>
+            <div class="mispres-stat">
+                <span class="mispres-stat-num">{{ prestamos | length }}</span>
+                <span class="mispres-stat-label">Total histórico</span>
+            </div>
+        </div>
+
+        {% if prestamos %}
+            <!-- Activos primero -->
+            {% set activos_list = prestamos | selectattr('estado', 'equalto', 'Activo') | list %}
+            {% if activos_list %}
+            <h3 class="mispres-section-title">Préstamos activos</h3>
+            <div class="mispres-cards">
+                {% for p in activos_list %}
+                <div class="mispres-card {% if p.esta_vencido() %}mispres-vencido{% endif %}">
+                    <div class="mispres-card-cover">
+                        <div class="mispres-cover-inner">
+                            <p>{{ p.libro.titulo }}</p>
+                        </div>
+                    </div>
+                    <div class="mispres-card-info">
+                        <h4><a href="{{ url_for('usuario.detalle', libro_id=p.libro.id) }}">{{ p.libro.titulo }}</a></h4>
+                        <p class="mispres-autores">
+                            {% if p.libro.autores %}{{ p.libro.autores | map(attribute='nombre') | join(', ') }}{% endif %}
+                        </p>
+                        <div class="mispres-fechas">
+                            <span>Prestado: {{ p.fecha_prestamo.strftime('%d/%m/%Y') }}</span>
+                            <span class="{% if p.esta_vencido() %}text-danger{% endif %}">
+                                Límite: {{ p.fecha_limite.strftime('%d/%m/%Y') }}
+                            </span>
+                        </div>
+                        {% if p.esta_vencido() %}
+                        <span class="estado-badge estado-vencido">Vencido hace {{ (p.fecha_limite - p.fecha_prestamo).days * -1 + p.dias_restantes() }} días</span>
+                        {% else %}
+                        <span class="estado-badge estado-activo">{{ p.dias_restantes() }} días restantes</span>
+                        {% endif %}
+                        <form method="POST" action="{{ url_for('usuario.devolver', prestamo_id=p.id) }}" style="margin-top:0.75rem;">
+                            <button type="submit" class="pl-btn-secondary">Devolver</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Historial devueltos -->
+            {% set devueltos = prestamos | rejectattr('estado', 'equalto', 'Activo') | list %}
+            {% if devueltos %}
+            <h3 class="mispres-section-title" style="margin-top:2.5rem;">Historial</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Libro</th>
+                        <th>Prestado</th>
+                        <th>Devuelto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in devueltos %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('usuario.detalle', libro_id=p.libro.id) }}">{{ p.libro.titulo }}</a>
+                        </td>
+                        <td>{{ p.fecha_prestamo.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ p.fecha_devolucion.strftime('%d/%m/%Y') if p.fecha_devolucion else '—' }}</td>
+                        <td><span class="estado-badge estado-{{ p.estado.lower() }}">{{ p.estado }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+        {% else %}
+            <div class="cat-empty" style="margin-top:3rem;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                <p>Aún no tienes préstamos registrados.</p>
+                <a href="{{ url_for('usuario.catalogo') }}" class="pl-btn-secondary">Explorar catálogo</a>
+            </div>
+        {% endif %}
+
+    </div>
+</main>
+{% endblock %}

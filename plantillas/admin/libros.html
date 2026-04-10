@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Libros — Biblioteca Virtual{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            Administración
+        </div>
+        <nav class="admin-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </a>
+            <a href="{{ url_for('admin.libros') }}" class="admin-nav-link active">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Libros
+            </a>
+            <a href="{{ url_for('admin.usuarios') }}" class="admin-nav-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Usuarios
+            </a>
+            <a href="{{ url_for('admin.prestamos') }}" class="admin-nav-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Préstamos
+            </a>
+        </nav>
+    </aside>
+
+    <main class="admin-content">
+        <div class="admin-page-header">
+            <div>
+                <h2>Libros</h2>
+                <span class="admin-page-sub">{{ libros|length if libros else 0 }} registros</span>
+            </div>
+            <button class="pl-btn-hero admin-btn-nuevo" onclick="toggleModal('modalNuevoLibro')">+ Nuevo libro</button>
+        </div>
+
+        <!-- Buscador rápido -->
+        <form class="admin-search-form" method="GET" action="{{ url_for('admin.libros') }}" autocomplete="off">
+            <div class="cat-search-box" style="max-width:420px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" name="q" value="{{ query or '' }}" placeholder="Buscar por título, ISBN, género..." autocomplete="off">
+                <button type="submit">Buscar</button>
+            </div>
+        </form>
+
+        <!-- Tabla -->
+        {% if libros %}
+        <div class="admin-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ISBN</th>
+                        <th>Título</th>
+                        <th>Autores</th>
+                        <th>Género</th>
+                        <th>Año</th>
+                        <th>Disponibles</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for libro in libros %}
+                    <tr>
+                        <td class="text-muted">{{ libro.isbn }}</td>
+                        <td><a href="{{ url_for('usuario.detalle', libro_id=libro.id) }}">{{ libro.titulo }}</a></td>
+                        <td>
+                            {% if libro.autores %}{{ libro.autores | map(attribute='nombre') | join(', ') }}
+                            {% else %}<span class="text-muted">—</span>{% endif %}
+                        </td>
+                        <td>{{ libro.genero or '—' }}</td>
+                        <td>{{ libro.anio_pub or '—' }}</td>
+                        <td>
+                            <span class="{% if libro.esta_disponible() %}text-success{% else %}text-danger{% endif %}">
+                                {{ libro.ejemplares_disponibles }}/{{ libro.ejemplares_total }}
+                            </span>
+                        </td>
+                        <td class="admin-actions-cell">
+                            <button class="admin-btn-edit" onclick="editarLibro({{ libro.id }}, '{{ libro.isbn }}', {{ libro.titulo|tojson }}, {{ (libro.genero or '')|tojson }}, {{ libro.anio_pub or 'null' }}, {{ libro.ejemplares_total }}, {{ (libro.descripcion or '')|tojson }})">Editar</button>
+                            <form method="POST" action="{{ url_for('admin.eliminar_libro', libro_id=libro.id) }}" onsubmit="return confirm('¿Eliminar {{ libro.titulo }}?');" style="display:inline;">
+                                <button type="submit" class="admin-btn-del">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="cat-empty">
+            <p>No hay libros registrados{% if query %} para "<strong>{{ query }}</strong>"{% endif %}.</p>
+        </div>
+        {% endif %}
+    </main>
+</div>
+
+<!-- Modal: Nuevo libro -->
+<div class="admin-modal-overlay" id="modalNuevoLibro">
+    <div class="admin-modal">
+        <div class="admin-modal-header">
+            <h3>Nuevo Libro</h3>
+            <button class="admin-modal-close" onclick="toggleModal('modalNuevoLibro')">✕</button>
+        </div>
+        <form method="POST" action="{{ url_for('admin.crear_libro') }}" class="admin-form">
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label>ISBN *</label>
+                    <input type="text" name="isbn" required maxlength="13" placeholder="978...">
+                </div>
+                <div class="admin-form-group">
+                    <label>Año de publicación</label>
+                    <input type="number" name="anio_pub" min="1000" max="2099" placeholder="2024">
+                </div>
+            </div>
+            <div class="admin-form-group">
+                <label>Título *</label>
+                <input type="text" name="titulo" required placeholder="Nombre del libro">
+            </div>
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label>Género</label>
+                    <input type="text" name="genero" placeholder="Novela, Ciencia...">
+                </div>
+                <div class="admin-form-group">
+                    <label>Ejemplares totales *</label>
+                    <input type="number" name="ejemplares_total" required min="1" value="1">
+                </div>
+            </div>
+            <div class="admin-form-group">
+                <label>Descripción</label>
+                <textarea name="descripcion" rows="3" placeholder="Sinopsis del libro..."></textarea>
+            </div>
+            <div class="admin-form-group">
+                <label>Autores (IDs separados por coma)</label>
+                <input type="text" name="autores_ids" placeholder="1,2,3">
+            </div>
+            <div class="admin-form-actions">
+                <button type="button" class="pl-btn-hero-outline" onclick="toggleModal('modalNuevoLibro')">Cancelar</button>
+                <button type="submit" class="pl-btn-hero">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Editar libro -->
+<div class="admin-modal-overlay" id="modalEditarLibro">
+    <div class="admin-modal">
+        <div class="admin-modal-header">
+            <h3>Editar Libro</h3>
+            <button class="admin-modal-close" onclick="toggleModal('modalEditarLibro')">✕</button>
+        </div>
+        <form method="POST" id="formEditarLibro" action="" class="admin-form">
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label>ISBN *</label>
+                    <input type="text" name="isbn" id="edit-isbn" required maxlength="13">
+                </div>
+                <div class="admin-form-group">
+                    <label>Año de publicación</label>
+                    <input type="number" name="anio_pub" id="edit-anio" min="1000" max="2099">
+                </div>
+            </div>
+            <div class="admin-form-group">
+                <label>Título *</label>
+                <input type="text" name="titulo" id="edit-titulo" required>
+            </div>
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label>Género</label>
+                    <input type="text" name="genero" id="edit-genero">
+                </div>
+                <div class="admin-form-group">
+                    <label>Ejemplares totales *</label>
+                    <input type="number" name="ejemplares_total" id="edit-ejemplares" required min="1">
+                </div>
+            </div>
+            <div class="admin-form-group">
+                <label>Descripción</label>
+                <textarea name="descripcion" id="edit-descripcion" rows="3"></textarea>
+            </div>
+            <div class="admin-form-actions">
+                <button type="button" class="pl-btn-hero-outline" onclick="toggleModal('modalEditarLibro')">Cancelar</button>
+                <button type="submit" class="pl-btn-hero">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

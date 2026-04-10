@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Biblioteca Virtual{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <nav class="dashboard-nav">
+        <a href="{{ url_for('auth.inicio') }}" class="brand">
+            <svg class="brand-owl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 40 30 Q 50 10 70 40 Q 100 25 130 40 Q 150 10 160 30 C 190 80, 180 160, 100 170 C 20 160, 10 80, 40 30 Z" fill="#005b9f"/>
+                <path d="M 50 110 Q 50 70 100 70 Q 150 70 150 110 C 150 150, 130 165, 100 165 C 70 165, 50 150, 50 110 Z" fill="#bae6fd"/>
+                <circle cx="75" cy="80" r="22" fill="#fff"/>
+                <circle cx="125" cy="80" r="22" fill="#fff"/>
+                <circle cx="75" cy="80" r="12" fill="#0f172a"/>
+                <circle cx="125" cy="80" r="12" fill="#0f172a"/>
+                <circle cx="70" cy="75" r="4" fill="#fff"/>
+                <circle cx="120" cy="75" r="4" fill="#fff"/>
+                <path d="M 95 100 L 105 100 L 100 112 Z" fill="#ea580c"/>
+            </svg>
+            Biblioteca Virtual
+        </a>
+        <div class="nav-links">
+            <a href="{{ url_for('usuario.catalogo') }}" {% if request.endpoint == 'usuario.catalogo' %}class="nav-active"{% endif %}>Catálogo</a>
+            <a href="{{ url_for('usuario.mis_prestamos') }}" {% if request.endpoint == 'usuario.mis_prestamos' %}class="nav-active"{% endif %}>Mis Préstamos</a>
+            {% if current_user.es_admin %}
+            <a href="{{ url_for('admin.dashboard') }}" {% if request.endpoint and request.endpoint.startswith('admin.') %}class="nav-active"{% endif %}>Administración</a>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}" class="logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="footer-inner">
+                <div class="footer-col footer-brand-col">
+                    <div class="footer-logo">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        <span>Biblioteca Virtual</span>
+                    </div>
+                    <p class="footer-desc">Plataforma digital de acceso libre al conocimiento.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Explorar</h4>
+                    <ul>
+                        <li><a href="{{ url_for('usuario.catalogo') }}">Catálogo Completo</a></li>
+                        <li><a href="{{ url_for('usuario.mis_prestamos') }}">Mis Préstamos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <ul>
+                        <li><a href="#">soporte@biblioteca.edu.co</a></li>
+                        <li><a href="#">Bogotá, Colombia</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Copyright © 2026 Biblioteca Virtual. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

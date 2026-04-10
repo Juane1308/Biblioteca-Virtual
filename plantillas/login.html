@@ -3,35 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Biblioteca Virtual</title>
+    <title>Iniciar Sesion - Biblioteca Virtual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
-<body>
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <h2>Bienvenido de nuevo</h2>
-            <p>Ingresa tus credenciales para acceder a la biblioteca</p>
-            
-            {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                {% for category, message in messages %}
-                  <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-              {% endif %}
-            {% endwith %}
+<body class="login-page">
 
-            <form method="POST" action="{{ url_for('auth.login') }}">
-                <div class="form-group">
-                    <label for="username">Usuario</label>
-                    <input type="text" id="username" name="username" required autocomplete="username">
+    <canvas id="particleCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;"></canvas>
+
+    <div class="auth-wrapper">
+      <div class="auth-scene">
+
+        <div class="auth-split-card" id="authSplitCard">
+
+            <!-- Panel oscuro deslizable -->
+            <div class="split-overlay">
+
+                <div class="split-panel-content for-login">
+                    <div class="panel-brand">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(56,189,248,0.7)" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        <span>Biblioteca Virtual</span>
+                    </div>
+                    <h2>Primera vez<br>aqui?</h2>
+                    <p>Registrate y descubre miles de libros esperandote en nuestra biblioteca digital.</p>
+                    <button class="split-panel-btn go-signup">Registrarse</button>
                 </div>
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" name="password" required autocomplete="current-password">
+
+                <div class="split-panel-content for-signup">
+                    <div class="panel-brand">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(56,189,248,0.7)" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        <span>Biblioteca Virtual</span>
+                    </div>
+                    <h2>Bienvenido<br>de vuelta</h2>
+                    <p>Ya tienes una cuenta? Ingresa y continua tu aventura literaria donde la dejaste.</p>
+                    <button class="split-panel-btn go-login">Iniciar Sesion</button>
                 </div>
-                <button type="submit" class="btn">Iniciar Sesión</button>
-            </form>
+
+            </div>
+
+            <!-- Formulario LOGIN -->
+            <div class="split-form split-form-login">
+                <h3 class="split-form-title">Login</h3>
+                <div class="split-title-line"></div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('auth.login') }}" autocomplete="off">
+                    <div class="split-input-group">
+                        <input type="text" id="username" name="username" class="split-input" placeholder="Usuario" required autocomplete="off">
+                        <svg class="split-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="split-input-group">
+                        <input type="password" id="password" name="password" class="split-input" placeholder="Contrasena" required autocomplete="new-password">
+                        <button type="button" class="eye-toggle" onclick="togglePassword('password', this)" tabindex="-1">
+                            <svg class="eye-icon eye-closed" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
+                            </svg>
+                            <svg class="eye-icon eye-open" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <button type="submit" class="split-btn">Login</button>
+                </form>
+                <p class="split-switch-text">No tienes cuenta? <button class="go-signup">Sign Up</button></p>
+            </div>
+
+            <!-- Formulario SIGN UP -->
+            <div class="split-form split-form-signup">
+                <h3 class="split-form-title">Sign Up</h3>
+                <div class="split-title-line"></div>
+                <form autocomplete="off">
+                    <div class="split-input-group">
+                        <input type="text" class="split-input" placeholder="Usuario" autocomplete="off">
+                        <svg class="split-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="split-input-group">
+                        <input type="email" class="split-input" placeholder="Email" autocomplete="off">
+                        <svg class="split-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                    </div>
+                    <div class="split-input-group">
+                        <input type="password" id="signup-password" class="split-input" placeholder="Contrasena" autocomplete="new-password">
+                        <button type="button" class="eye-toggle" onclick="togglePassword('signup-password', this)" tabindex="-1">
+                            <svg class="eye-icon eye-closed" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
+                            </svg>
+                            <svg class="eye-icon eye-open" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <button type="button" class="split-btn">Sign Up</button>
+                </form>
+                <p class="split-switch-text">Ya tienes cuenta? <button class="go-login">Login</button></p>
+            </div>
+
         </div>
+
+        <!-- Buho centrado encima del card -->
+        <div class="owl-container" id="owlContainer">
+            <svg class="owl-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path class="owl-arm owl-arm-left" d="M 30 80 Q -5 120, 30 155 Z" fill="var(--primary-hover)"/>
+                <path class="owl-arm owl-arm-right" d="M 170 80 Q 205 120, 170 155 Z" fill="var(--primary-hover)"/>
+                <path d="M 70 170 Q 60 190 55 190 Q 60 180 65 180 Q 70 190 75 190 Q 80 180 85 190 Q 80 190 75 170 Z" fill="var(--badge-orange)"/>
+                <path d="M 130 170 Q 120 190 115 190 Q 120 180 125 180 Q 130 190 135 190 Q 140 180 145 190 Q 140 190 125 170 Z" fill="var(--badge-orange)"/>
+                <path class="owl-body" d="M 40 30 Q 50 10 70 40 Q 100 25 130 40 Q 150 10 160 30 C 190 80, 180 160, 100 170 C 20 160, 10 80, 40 30 Z" fill="var(--primary)"/>
+                <path d="M 52 28 Q 55 18, 60 32" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                <path d="M 148 28 Q 145 18, 140 32" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                <path class="owl-body-belly" d="M 50 110 Q 50 70 100 70 Q 150 70 150 110 C 150 150, 130 165, 100 165 C 70 165, 50 150, 50 110 Z" fill="#bae6fd"/>
+                <path d="M 72 105 Q 79 115 86 105" fill="none" stroke="#7dd3fc" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M 92 105 Q 99 115 106 105" fill="none" stroke="#7dd3fc" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M 112 105 Q 119 115 126 105" fill="none" stroke="#7dd3fc" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M 80 125 Q 87 135 94 125" fill="none" stroke="#7dd3fc" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M 106 125 Q 113 135 120 125" fill="none" stroke="#7dd3fc" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M 93 145 Q 100 155 107 145" fill="none" stroke="#7dd3fc" stroke-width="3.5" stroke-linecap="round"/>
+                <path class="owl-brow owl-brow-left" d="M 50 58 Q 65 48, 80 55" fill="none" stroke="var(--primary-hover)" stroke-width="3.5" stroke-linecap="round"/>
+                <path class="owl-brow owl-brow-right" d="M 120 55 Q 135 48, 150 58" fill="none" stroke="var(--primary-hover)" stroke-width="3.5" stroke-linecap="round"/>
+                <g class="owl-eye-open">
+                    <circle cx="75" cy="80" r="28" fill="#fff"/>
+                    <circle cx="125" cy="80" r="28" fill="#fff"/>
+                    <g class="owl-pupil" id="pupil-left">
+                        <circle cx="75" cy="80" r="16" fill="#0f172a"/>
+                        <circle cx="68" cy="74" r="5" fill="#fff"/>
+                    </g>
+                    <g class="owl-pupil" id="pupil-right">
+                        <circle cx="125" cy="80" r="16" fill="#0f172a"/>
+                        <circle cx="118" cy="74" r="5" fill="#fff"/>
+                    </g>
+                </g>
+                <g class="owl-eye-closed">
+                    <path d="M 50 80 Q 75 97 100 80" fill="none" stroke="var(--primary-hover)" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M 100 80 Q 125 97 150 80" fill="none" stroke="var(--primary-hover)" stroke-width="4" stroke-linecap="round"/>
+                </g>
+                <path d="M 92 100 Q 100 90 108 100 L 100 115 Z" fill="var(--badge-orange)"/>
+                <path d="M 96 100 Q 100 95 104 100" fill="none" stroke="#fb923c" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            </svg>
+            <div class="zzz-container">
+                <span class="z1">z</span>
+                <span class="z2">Z</span>
+                <span class="z3">Z</span>
+            </div>
+        </div>
+
+      </div>
     </div>
+
+    <script src="{{ url_for('static', filename='js/login-anim.js') }}"></script>
+    <script>
+    function togglePassword(id, btn) {
+        const input = document.getElementById(id);
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        btn.querySelector('.eye-closed').style.display = isHidden ? 'none' : '';
+        btn.querySelector('.eye-open').style.display  = isHidden ? ''     : 'none';
+    }
+    </script>
+    <script>
+    (function(){
+      const canvas = document.getElementById('particleCanvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
+      const mouse = { x: -9999, y: -9999 };
+      const COUNT = 110, CONNECT_DIST = 110, MOUSE_DIST = 150;
+      const particles = [];
+
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+      function Particle() {
+        this.x = this.bx = Math.random() * (W || 1200);
+        this.y = this.by = Math.random() * (H || 800);
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.r  = Math.random() * 1.8 + 0.6;
+        this.a  = Math.random() * 0.45 + 0.25;
+      }
+
+      for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+      window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+      window.addEventListener('resize', resize);
+      resize();
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (let i = 0; i < COUNT; i++) {
+          const p = particles[i];
+          p.bx += p.vx; p.by += p.vy;
+          if (p.bx < 0 || p.bx > W) p.vx *= -1;
+          if (p.by < 0 || p.by > H) p.vy *= -1;
+          const dmx = mouse.x - p.x, dmy = mouse.y - p.y;
+          const dm = Math.sqrt(dmx*dmx + dmy*dmy);
+          if (dm < MOUSE_DIST && dm > 0) { const f = (MOUSE_DIST-dm)/MOUSE_DIST; p.x -= dmx/dm*f*3; p.y -= dmy/dm*f*3; }
+          else { p.x += (p.bx-p.x)*0.04; p.y += (p.by-p.y)*0.04; }
+          if (dm < MOUSE_DIST) {
+            ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(mouse.x,mouse.y);
+            ctx.strokeStyle=`rgba(56,189,248,${(1-dm/MOUSE_DIST)*0.45})`; ctx.lineWidth=0.8; ctx.stroke();
+          }
+          for (let j = i+1; j < COUNT; j++) {
+            const q = particles[j], dx = p.x-q.x, dy = p.y-q.y, d = Math.sqrt(dx*dx+dy*dy);
+            if (d < CONNECT_DIST) {
+              ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
+              ctx.strokeStyle=`rgba(56,189,248,${(1-d/CONNECT_DIST)*0.2})`; ctx.lineWidth=0.5; ctx.stroke();
+            }
+          }
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fillStyle=`rgba(56,189,248,${p.a})`; ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+    </script>
 </body>
 </html>

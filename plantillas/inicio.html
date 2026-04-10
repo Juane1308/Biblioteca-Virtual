@@ -4,41 +4,449 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Biblioteca Virtual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
 <body>
+
+    <!-- ==================== NAVBAR ==================== -->
     <nav class="dashboard-nav">
-        <div class="brand">Biblioteca Virtual</div>
+        <div class="brand">
+            <!-- Mini búho en navbar -->
+            <svg class="brand-owl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 40 30 Q 50 10 70 40 Q 100 25 130 40 Q 150 10 160 30 C 190 80, 180 160, 100 170 C 20 160, 10 80, 40 30 Z" fill="#005b9f"/>
+                <path d="M 50 110 Q 50 70 100 70 Q 150 70 150 110 C 150 150, 130 165, 100 165 C 70 165, 50 150, 50 110 Z" fill="#bae6fd"/>
+                <circle cx="75" cy="80" r="22" fill="#fff"/>
+                <circle cx="125" cy="80" r="22" fill="#fff"/>
+                <circle cx="75" cy="80" r="12" fill="#0f172a"/>
+                <circle cx="125" cy="80" r="12" fill="#0f172a"/>
+                <circle cx="70" cy="75" r="4" fill="#fff"/>
+                <circle cx="120" cy="75" r="4" fill="#fff"/>
+                <path d="M 95 100 L 105 100 L 100 112 Z" fill="#ea580c"/>
+            </svg>
+            Biblioteca Virtual
+        </div>
         <div class="nav-links">
-            <a href="#">Catálogo</a>
-            <a href="#">Mis Préstamos</a>
+            <a href="{{ url_for('usuario.catalogo') }}">Catálogo</a>
+            <a href="{{ url_for('usuario.mis_prestamos') }}">Mis Préstamos</a>
             {% if current_user.es_admin %}
-            <a href="#">Administración</a>
+            <a href="{{ url_for('admin.dashboard') }}" class="nav-admin">Administración</a>
             {% endif %}
             <a href="{{ url_for('auth.logout') }}" class="logout">Cerrar Sesión</a>
         </div>
     </nav>
 
-    <main class="dashboard-content">
-        <div class="welcome-banner">
-            <h1>Hola, {{ current_user.nombre }}</h1>
-            <p>Bienvenido al panel principal de la biblioteca. Aquí puedes explorar y gestionar tus lecturas.</p>
+    <main class="pl-main-content">
+
+        <!-- ==================== HERO ==================== -->
+        <section class="pl-hero" data-parallax>
+            <div class="pl-hero-content">
+                <span class="hero-badge">✦ Bienvenido a tu biblioteca</span>
+                <h1 data-gsap="hero-title">Palabras<br>que <em>Abrazan</em></h1>
+                <p data-gsap="hero-text">Descubre historias increíbles, aventuras inolvidables y el conocimiento infinito que aguarda en cada página.</p>
+
+                <!-- Barra de búsqueda -->
+                <div class="hero-search" data-gsap="hero-search">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" placeholder="Buscar libros, autores, géneros..." autocomplete="off">
+                    <button>Buscar</button>
+                </div>
+
+                <div class="hero-actions" data-gsap="hero-actions">
+                    <button class="pl-btn-hero" onclick="document.getElementById('novedades').scrollIntoView({behavior:'smooth'})">Explorar Novedades</button>
+                </div>
+            </div>
+
+            <div class="pl-hero-image" data-gsap="hero-book">
+                <div class="hero-glow"></div>
+                <div class="hero-book-3d" id="heroBook">
+                    <div class="hero-book-spine"></div>
+                    <div class="hero-book-front cover-viento">
+                        <div class="cover-title">El Nombre del Viento</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ESTADÍSTICAS ==================== -->
+        <section class="pl-stats" data-gsap="stats">
+            <div class="pl-stats-inner">
+                <div class="stat-item">
+                    <span class="stat-number" data-count="2500">0</span>
+                    <span class="stat-label">Libros Disponibles</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="150">0</span>
+                    <span class="stat-label">Autores</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="30">0</span>
+                    <span class="stat-label">Categorías</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="800">0</span>
+                    <span class="stat-label">Usuarios Activos</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TEMÁTICAS ==================== -->
+        <div class="section-bg-alt">
+            <section class="pl-section pl-tematicas">
+                <h2 class="pl-section-title">Nuestras Temáticas</h2>
+                <p class="pl-section-subtitle">Encuentra tu libro a partir de tu temática favorita</p>
+                <div class="section-line"><span></span></div>
+                <div class="pl-tematicas-grid" data-gsap="tematicas">
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Novela') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                            </svg>
+                        </span>
+                        <strong>Novela</strong>
+                        <span class="tematica-count">342 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Fantasía') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </span>
+                        <strong>Fantasía</strong>
+                        <span class="tematica-count">215 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Autoayuda') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                            </svg>
+                        </span>
+                        <strong>Autoayuda</strong>
+                        <span class="tematica-count">178 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Ciencia') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                        </span>
+                        <strong>Ciencia</strong>
+                        <span class="tematica-count">124 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Romance') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </span>
+                        <strong>Romance</strong>
+                        <span class="tematica-count">298 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Historia') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </span>
+                        <strong>Historia</strong>
+                        <span class="tematica-count">187 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Poesía') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>
+                            </svg>
+                        </span>
+                        <strong>Poesía</strong>
+                        <span class="tematica-count">89 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Infantil') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+                            </svg>
+                        </span>
+                        <strong>Infantil</strong>
+                        <span class="tematica-count">156 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Misterio') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                        </span>
+                        <strong>Misterio</strong>
+                        <span class="tematica-count">203 libros</span>
+                    </a>
+
+                    <a class="pl-tematica-card" href="{{ url_for('usuario.catalogo', genero='Tecnología') }}">
+                        <span class="tematica-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </span>
+                        <strong>Tecnología</strong>
+                        <span class="tematica-count">96 libros</span>
+                    </a>
+
+                </div>
+            </section>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-title">Préstamos Activos</span>
-                <span class="stat-value">0</span>
+        <!-- ==================== LOS MÁS LEÍDOS ==================== -->
+        <section class="pl-section pl-catalogo">
+            <h2 class="pl-section-title">Los Más Leídos</h2>
+            <p class="pl-section-subtitle">Los favoritos de nuestros lectores esta semana</p>
+            <div class="section-line"><span></span></div>
+            <div class="pl-books-grid" data-gsap="books">
+
+                <div class="pl-book-card">
+                    <div class="pl-book-cover cover-viento">
+                        <span class="pl-badge">1</span>
+                        <span class="pl-tag">MÁS VENDIDO</span>
+                        <div class="cover-title">El Nombre del Viento</div>
+                    </div>
+                    <div class="pl-book-info">
+                        <h3>El Nombre del Viento</h3>
+                        <a href="#" class="pl-book-author">Patrick Rothfuss</a>
+                        <span class="pl-book-genre">Fantasía</span>
+                        <button class="pl-btn-secondary">Añadir a mi lista</button>
+                    </div>
+                </div>
+
+                <div class="pl-book-card">
+                    <div class="pl-book-cover cover-soledad">
+                        <span class="pl-badge">2</span>
+                        <div class="cover-title">Cien Años de Soledad</div>
+                    </div>
+                    <div class="pl-book-info">
+                        <h3>Cien Años de Soledad</h3>
+                        <a href="#" class="pl-book-author">Gabriel García Márquez</a>
+                        <span class="pl-book-genre">Ficción</span>
+                        <button class="pl-btn-secondary">Añadir a mi lista</button>
+                    </div>
+                </div>
+
+                <div class="pl-book-card">
+                    <div class="pl-book-cover cover-sapiens">
+                        <span class="pl-badge">3</span>
+                        <span class="pl-tag new-tag">NOVEDAD</span>
+                        <div class="cover-title">Sapiens</div>
+                    </div>
+                    <div class="pl-book-info">
+                        <h3>Sapiens</h3>
+                        <a href="#" class="pl-book-author">Yuval Noah Harari</a>
+                        <span class="pl-book-genre">Ciencia</span>
+                        <button class="pl-btn-secondary">Añadir a mi lista</button>
+                    </div>
+                </div>
+
+                <div class="pl-book-card">
+                    <div class="pl-book-cover cover-habitos">
+                        <span class="pl-badge">4</span>
+                        <span class="pl-tag audio-tag">AUDIO</span>
+                        <div class="cover-title">Hábitos Atómicos</div>
+                    </div>
+                    <div class="pl-book-info">
+                        <h3>Hábitos Atómicos</h3>
+                        <a href="#" class="pl-book-author">James Clear</a>
+                        <span class="pl-book-genre">Autoayuda</span>
+                        <button class="pl-btn-secondary">Añadir a mi lista</button>
+                    </div>
+                </div>
+
             </div>
-            <div class="stat-card">
-                <span class="stat-title">Libros Leídos</span>
-                <span class="stat-value">0</span>
+        </section>
+
+        <!-- ==================== NOVEDADES ==================== -->
+        <div id="novedades" class="section-bg-alt">
+            <section class="pl-section pl-novedades">
+                <h2 class="pl-section-title">Recién Llegados</h2>
+                <p class="pl-section-subtitle">Las últimas adquisiciones de nuestra biblioteca</p>
+                <div class="section-line"><span></span></div>
+                <div class="pl-books-grid" data-gsap="novedades">
+
+                    <div class="pl-book-card">
+                        <div class="pl-book-cover cover-novedad-1">
+                            <span class="pl-tag new-tag">NUEVO</span>
+                            <div class="cover-title">El Principito</div>
+                        </div>
+                        <div class="pl-book-info">
+                            <h3>El Principito</h3>
+                            <a href="#" class="pl-book-author">Antoine de Saint-Exupéry</a>
+                            <span class="pl-book-genre">Clásico</span>
+                            <button class="pl-btn-secondary">Añadir a mi lista</button>
+                        </div>
+                    </div>
+
+                    <div class="pl-book-card">
+                        <div class="pl-book-cover cover-novedad-2">
+                            <span class="pl-tag new-tag">NUEVO</span>
+                            <div class="cover-title">1984</div>
+                        </div>
+                        <div class="pl-book-info">
+                            <h3>1984</h3>
+                            <a href="#" class="pl-book-author">George Orwell</a>
+                            <span class="pl-book-genre">Distopía</span>
+                            <button class="pl-btn-secondary">Añadir a mi lista</button>
+                        </div>
+                    </div>
+
+                    <div class="pl-book-card">
+                        <div class="pl-book-cover cover-novedad-3">
+                            <span class="pl-tag new-tag">NUEVO</span>
+                            <div class="cover-title">Don Quijote de la Mancha</div>
+                        </div>
+                        <div class="pl-book-info">
+                            <h3>Don Quijote de la Mancha</h3>
+                            <a href="#" class="pl-book-author">Miguel de Cervantes</a>
+                            <span class="pl-book-genre">Clásico</span>
+                            <button class="pl-btn-secondary">Añadir a mi lista</button>
+                        </div>
+                    </div>
+
+                    <div class="pl-book-card">
+                        <div class="pl-book-cover cover-novedad-4">
+                            <span class="pl-tag new-tag">NUEVO</span>
+                            <div class="cover-title">La Sombra del Viento</div>
+                        </div>
+                        <div class="pl-book-info">
+                            <h3>La Sombra del Viento</h3>
+                            <a href="#" class="pl-book-author">Carlos Ruiz Zafón</a>
+                            <span class="pl-book-genre">Misterio</span>
+                            <button class="pl-btn-secondary">Añadir a mi lista</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== AUTORES DESTACADOS ==================== -->
+        <section class="pl-section pl-autores">
+            <h2 class="pl-section-title">Autores Destacados</h2>
+            <p class="pl-section-subtitle">Las mentes brillantes detras de nuestras obras mas populares</p>
+            <div class="section-line"><span></span></div>
+            <div class="pl-books-grid" data-gsap="autores">
+
+                <div class="pl-book-card">
+                    <div class="pl-book-cover cover-placeholder"></div>
+                    <div class="pl-book-info">
+                        <h3>Nombre del Autor</h3>
+                        <span class="pl-book-genre">Género</span>
+                        <button class="pl-btn-secondary">Acerca del Autor</button>
+                    </div>
+                </div>
+
+                <div class="pl-book-card">
+                    <div class="pl-book-cover cover-placeholder"></div>
+                    <div class="pl-book-info">
+                        <h3>Nombre del Autor</h3>
+                        <span class="pl-book-genre">Género</span>
+                        <button class="pl-btn-secondary">Acerca del Autor</button>
+                    </div>
+                </div>
+
+                <div class="pl-book-card">
+                    <div class="pl-book-cover cover-placeholder"></div>
+                    <div class="pl-book-info">
+                        <h3>Nombre del Autor</h3>
+                        <span class="pl-book-genre">Género</span>
+                        <button class="pl-btn-secondary">Acerca del Autor</button>
+                    </div>
+                </div>
+
+                <div class="pl-book-card">
+                    <div class="pl-book-cover cover-placeholder"></div>
+                    <div class="pl-book-info">
+                        <h3>Nombre del Autor</h3>
+                        <span class="pl-book-genre">Género</span>
+                        <button class="pl-btn-secondary">Acerca del Autor</button>
+                    </div>
+                </div>
+
             </div>
-            <div class="stat-card">
-                <span class="stat-title">Nuevos Ingresos</span>
-                <span class="stat-value">12</span>
+        </section>
+
+        <!-- ==================== RECOMENDADOS ==================== -->
+        <section class="pl-section pl-recomendados">
+            <div class="pl-recomendado-banner" data-gsap="recomendado">
+                <div class="pl-recomendado-text">
+                    <span class="hero-badge" style="background:rgba(56,189,248,0.15);border-color:rgba(56,189,248,0.3);color:#38bdf8;">✦ Recomendado para ti</span>
+                    <h2>Cien Años de Soledad</h2>
+                    <p>Una historia que ha cruzado generaciones y fronteras. Descubre la obra que cambio para siempre la literatura en español.</p>
+                    <button class="pl-btn-hero" style="margin-top:1.5rem;">Ver Detalles</button>
+                </div>
+                <div class="pl-recomendado-cover cover-soledad"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="footer-inner">
+                <div class="footer-col footer-brand-col">
+                    <div class="footer-logo">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        <span>Biblioteca Virtual</span>
+                    </div>
+                    <p class="footer-desc">Plataforma digital de acceso libre al conocimiento. Promovemos la lectura y la cultura a través de la tecnología.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Explorar</h4>
+                    <ul>
+                        <li><a href="#">Catálogo Completo</a></li>
+                        <li><a href="#">Novedades</a></li>
+                        <li><a href="#">Más Leídos</a></li>
+                        <li><a href="#">Autores</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Recursos</h4>
+                    <ul>
+                        <li><a href="#">Guía de Uso</a></li>
+                        <li><a href="#">Preguntas Frecuentes</a></li>
+                        <li><a href="#">Términos y Condiciones</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <ul>
+                        <li><a href="#">soporte@biblioteca.edu.co</a></li>
+                        <li><a href="#">+57 (1) 234 5678</a></li>
+                        <li><a href="#">Bogotá, Colombia</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </main>
+        <div class="footer-bottom">
+            <p>Copyright © 2026 Biblioteca Virtual. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- GSAP desde CDN (CLAUDE.md) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="{{ url_for('static', filename='js/inicio-anim.js') }}"></script>
 </body>
 </html>
