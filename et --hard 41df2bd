@@ -1,0 +1,23 @@
+[33m159785b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: commit: modelo funcional biblioteca (nuevo front)
+[33m5564bc2[m HEAD@{1}: reset: moving to HEAD~3
+[33mf295f5e[m HEAD@{2}: reset: moving to HEAD~3
+[33m41df2bd[m HEAD@{3}: reset: moving to 41df2bd
+[33m18eafe9[m HEAD@{4}: checkout: moving from fe104a41a801d9a369399ae6389ece7229b7668a to main
+[33mfe104a4[m HEAD@{5}: checkout: moving from main to fe104a4
+[33m18eafe9[m HEAD@{6}: filter-branch: rewrite
+[33m26d7125[m HEAD@{7}: commit (amend): Ajustes de configuración y gitignore
+[33m42e2552[m HEAD@{8}: reset: moving to HEAD~1
+[33mc52509d[m HEAD@{9}: filter-branch: rewrite
+[33m9ca2fb0[m HEAD@{10}: commit: Eliminar carpeta .claude del repositorio
+[33m949eb96[m HEAD@{11}: filter-branch: rewrite
+[33m8e69a8d[m HEAD@{12}: reset: moving to origin/main
+[33m0a2e983[m HEAD@{13}: reset: moving to HEAD~3
+[33m8e69a8d[m HEAD@{14}: commit (merge): Merge origin/main manteniendo estructura MVC en español
+[33m1b60143[m HEAD@{15}: commit: Implementación completa de la vista
+[33m2731ae2[m HEAD@{16}: commit: Integración backend: auth funcional, seed y registro
+[33m0a2e983[m HEAD@{17}: reset: moving to 0a2e983
+[33m0a2e983[m HEAD@{18}: rebase (abort): returning to refs/heads/main
+[33m8bffebb[m HEAD@{19}: pull origin main --rebase (start): checkout 8bffebbea50e7f1f416e6877d77f88e4c33bd641
+[33m0a2e983[m HEAD@{20}: commit: Vista completada
+[33mc17cbef[m HEAD@{21}: commit: Agregué función de login
+[33m592c8e4[m HEAD@{22}: clone: from https://github.com/Juane1308/Biblioteca-Virtual.git
